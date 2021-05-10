@@ -1,0 +1,14 @@
+{
+    "perset":[
+        "eslint",
+        "sirbnb",
+        "esprima"
+    ],
+    "plugins": [
+        "eslint-plugin-import",
+        "a-plugin"
+    ],
+    "extends": [
+        "airbnb-base"
+    ]
+}

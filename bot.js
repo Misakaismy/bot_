@@ -1,38 +1,52 @@
-
-var Discord = require('discord.io');
-var logger = require('winston');
-var auth = require('./auth.json');
+// var Discord = require('discord.io');
+import logger from 'winston';
+import {token} from './auth.js';
+import Discord from 'discord.js';
+// import { Console } from 'winston/lib/winston/transports';
+// function
+import dice from './bot_function/dice_function.js';
+import delete_message_log from './bot_function/delete_message_log.js';
+import update_message_log from './bot_function/update_message_log.js';
+import response from './bot_function/bot_response.js';
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
     colorize: true
 });
 logger.level = "debug";
+const bot = new Discord.Client;
 // Initialize Discord Bot
-var bot = new Discord.Client({
-   token: auth.token,
-   autorun: true
-});
+// var bot = new Discord.Client({
+//    token: auth.token,
+//    autorun: true
+// });
 bot.on("ready", function (evt) {
     logger.info("Connected");
     logger.info("Logged in as: ");
     logger.info(bot.username + " - (" + bot.id + ")");
+    console.log('Bot is ready!')
 });
-bot.on("message", function (user, userID, channelID, message, evt) {
-if (message.substring(0, 1) == '!') {
-        var args = message.substring(1).split(' ');
+
+bot.on("message", (message) => {
+    var content = message.content
+    if (content.substring(0, 1) == '!') {
+        var args = content.substring(1).split(' ');
         var cmd = args[0];
+        dice.bot_dice(cmd);
+    }
 
-//主要修改的部分
-var ran = Math.floor(Math.random()*100)+1;//亂數產生1~100
-        switch(cmd) {
-            case 'dice'://若輸入!dice時執行
-                bot.sendMessage({
-                    to: channelID,
-                    message: user + ' 骰出了 ' + ran + ' 點！'//機器人回覆這一行字
-                });
-            break;
-         }
-
-     }
+    if ((message.content.indexOf(`<@${bot.user.id}>`)!=0)&(!(message.author.bot))) {
+        response.bot_response(message);
+    }
 });
+
+bot.on("messageDelete", (messageDelete) => {
+    delete_message_log.delete_message_log_function(messageDelete);
+});
+
+bot.on('messageUpdate', (oldMessage, newMessage) => {
+    if (!(newMessage.author.bot) & (!(newMessage.webhookID)))
+        update_message_log.update_message_log_function(oldMessage, newMessage);
+});
+
+bot.login(token);
