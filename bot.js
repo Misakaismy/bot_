@@ -4,7 +4,7 @@ import {token} from './auth.js';
 import Discord from 'discord.js';
 // import { Console } from 'winston/lib/winston/transports';
 // function
-import dice from './bot_function/dice_function.js';
+import default_function from './bot_function/default_function.js';
 import delete_message_log from './bot_function/delete_message_log.js';
 import update_message_log from './bot_function/update_message_log.js';
 import response from './bot_function/bot_response.js';
@@ -32,12 +32,15 @@ bot.on("message", (message) => {
     if (content.substring(0, 1) == '!') {
         var args = content.substring(1).split(' ');
         var cmd = args[0];
-        dice.bot_dice(cmd);
+        var channel = args[1];
+        default_function.bot_dice(cmd,message);
+        default_function.set_channel(cmd,channel,message)
     }
 
-    if ((message.content.indexOf(`<@${bot.user.id}>`)!=0)&(!(message.author.bot))) {
-        response.bot_response(message);
-    }
+    // else if ((content.indexOf(`${bot.user.id}`)!==0)) {
+    //     if (!(message.author.bot))
+    //         response.bot_response(message);
+    // }
 });
 
 bot.on("messageDelete", (messageDelete) => {
